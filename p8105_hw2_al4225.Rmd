@@ -73,6 +73,7 @@ wheel_data =
   janitor::clean_names() 
 nrow(wheel_data) 
 ncol(wheel_data)
+
 wheel_data
 ```
 
@@ -271,5 +272,142 @@ nrow(pols_snp_unemployment)
 ncol(pols_snp_unemployment)
 
 pols_snp_unemployment
+```
+
+## Problem 1
+Read and clean the data; retain line, station, name, station latitude / longitude, routes served, entry, vending, entrance type, and ADA compliance. Convert the entry variable from character (YES vs NO) to a logical variable (the ifelse or recode function may be useful).
+
+There are `r nyc_transit = read_csv("./data/p1.csv",
+              col_names = TRUE,
+              show_col_types = FALSE) %>%
+  janitor::clean_names() %>%
+  select(-division, -exit_only,-staffing, -staff_hours, -ada_notes, -free_crossover, -north_south_street, -east_west_street, -corner, -entrance_latitude, -entrance_longitude, -station_location, -entrance_location) %>%
+  mutate(route8 = as.character(route8), route9 = as.character(route9), route10 = as.character(route10), route11 = as.character(route11)) %>%
+  pivot_longer(
+    route1:route11, 
+    names_to = "route", 
+    values_to = "route_value") %>%  
+  filter(!is.na(route_value) ) %>%
+  unique() %>%
+  mutate(entry = recode(entry, YES = TRUE, NO = FALSE)) 
+  nrow(nyc_transit)` observations and `r nyc_transit = read_csv("./data/p1.csv",
+              col_names = TRUE,
+              show_col_types = FALSE) %>%
+  janitor::clean_names() %>%
+  select(-division, -exit_only,-staffing, -staff_hours, -ada_notes, -free_crossover, -north_south_street, -east_west_street, -corner, -entrance_latitude, -entrance_longitude, -station_location, -entrance_location) %>%
+  mutate(route8 = as.character(route8), route9 = as.character(route9), route10 = as.character(route10), route11 = as.character(route11)) %>%
+  pivot_longer(
+    route1:route11, 
+    names_to = "route", 
+    values_to = "route_value") %>%  
+  filter(!is.na(route_value) ) %>%
+  unique() %>%
+  mutate(entry = recode(entry, YES = TRUE, NO = FALSE)) 
+  ncol(nyc_transit)` variables in the dataset. It concludes key variables such as line, station, name, station latitude / longitude, routes served, entry, vending, entrance type, and ADA compliance.
+  
+So far, the data is clearer than before but not clear enough. So I use **pivot_longer** to make the routes variables into one column "route" and it is clearer. 
+```{r}
+library(tidyverse)
+nyc_transit = read_csv("./data/p1.csv",
+              col_names = TRUE,
+              show_col_types = FALSE) %>%
+  janitor::clean_names() %>%
+  select(-division, -exit_only,-staffing, -staff_hours, -ada_notes, -free_crossover, -north_south_street, -east_west_street, -corner, -entrance_latitude, -entrance_longitude, -station_location, -entrance_location) %>%
+  mutate(route8 = as.character(route8), route9 = as.character(route9), route10 = as.character(route10), route11 = as.character(route11)) %>%
+  pivot_longer(
+    route1:route11, 
+    names_to = "route", 
+    values_to = "route_value") %>%  
+  filter(!is.na(route_value) ) %>%
+  unique() %>%
+  mutate(entry = recode(entry, YES = TRUE, NO = FALSE))
+
+nyc_transit
+         
+```
+
+
+There are `r nyc_transit %>%
+  distinct(station_name, line) %>% 
+  nrow()` different stations according to the station_name and line.
+```{r}
+nyc_transit %>%
+  distinct(station_name, line) %>% 
+  nrow()
+```
+
+There are `r nyc_transit %>%
+  filter(ada == "TRUE") %>%
+  distinct(station_name, line) %>% 
+  nrow()` stations are ADA compliant.
+```{r}
+nyc_transit %>%
+  filter(ada == "TRUE") %>%
+  distinct(station_name, line) %>% 
+  nrow()
+```
+
+What proportion of station entrances / exits without vending allow entrance?
+The proportion of station entrances / exits without vending allow entrance is 0.434.
+```{r}
+without_vending = 
+  nyc_transit %>%
+  filter(vending == "NO") %>%
+  distinct(station_name, line)
+  nrow(without_vending)
+
+entry_without_vending =
+  nyc_transit %>%
+  filter(vending == "NO", entry == "TRUE") %>%
+  distinct(station_name, line)
+  nrow(entry_without_vending)
+
+proportion = nrow(entry_without_vending) / nrow(without_vending) 
+proportion
+```
+
+Reformat data so that route number and route name are distinct variables. How many distinct stations serve the A train? 
+
+I already tidied the dataset before to make routes into 1 column. Now I will reformat and do it again and there are 60 stations serve the A train.
+```{r}
+library(tidyverse)
+reformat = read_csv("./data/p1.csv",
+              col_names = TRUE,
+              show_col_types = FALSE) %>%
+  janitor::clean_names() %>%
+  select(-division, -exit_only,-staffing, -staff_hours, -ada_notes, -free_crossover, -north_south_street, -east_west_street, -corner, -entrance_latitude, -entrance_longitude, -station_location, -entrance_location) %>%
+  mutate(route8 = as.character(route8), route9 = as.character(route9), route10 = as.character(route10), route11 = as.character(route11)) %>%
+  pivot_longer(
+    route1:route11, 
+    names_to = "route", 
+    values_to = "route_value") %>%  
+  filter(!is.na(route_value), 
+         route_value == "A") %>%
+  distinct(station_name, line) %>%
+  nrow()
+
+reformat
+```
+
+Of the stations that serve the A train, how many are ADA compliant.
+17 of them are ADA compliant.
+```{r}
+ada_compliant = reformat = read_csv("./data/p1.csv",
+              col_names = TRUE,
+              show_col_types = FALSE) %>%
+  janitor::clean_names() %>%
+  select(-division, -exit_only,-staffing, -staff_hours, -ada_notes, -free_crossover, -north_south_street, -east_west_street, -corner, -entrance_latitude, -entrance_longitude, -station_location, -entrance_location) %>%
+  mutate(route8 = as.character(route8), route9 = as.character(route9), route10 = as.character(route10), route11 = as.character(route11)) %>%
+  pivot_longer(
+    route1:route11, 
+    names_to = "route", 
+    values_to = "route_value") %>%  
+  filter(!is.na(route_value), 
+         route_value == "A",
+         ada == "TRUE") %>%
+  distinct(station_name, line) %>%
+  nrow()
+
+ada_compliant
 ```
 
