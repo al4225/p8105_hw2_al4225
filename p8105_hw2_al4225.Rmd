@@ -98,3 +98,178 @@ wheel_data %>%
   colSums()
 ```
 
+
+## Problem 3
+### Pols
+First, clean the data in pols-month.csv. Use separate() to break up the variable mon into integer variables year, month, and day; replace month number with month name; create a president variable taking values gop and dem, and remove prez_dem and prez_gop; and remove the day variable.
+
+Description: in pols dateset, there are `r pols = read_csv("./data/p3/pols-month.csv",
+                col_names = TRUE,
+                show_col_types = FALSE) %>%
+  janitor::clean_names() %>%
+  drop_na() %>%
+  separate(mon, into  = c("year", "month", "day"), sep = "-") %>%
+  mutate(year = as.integer(year), 
+         month = as.integer(month),
+         day = as.integer(day), 
+         month = month.abb[month]) %>%
+  pivot_longer(
+    c(prez_gop, prez_dem),
+    names_to = "president", 
+    values_to = "prez_value"
+  ) %>%
+  mutate(president = recode(president, "prez_gop" = "gop", "prez_dem" = "dem")) %>%
+  filter(!prez_value == 0) %>%
+  select(-day) 
+nrow(pols)` observations and `r pols = read_csv("./data/p3/pols-month.csv",
+                col_names = TRUE,
+                show_col_types = FALSE) %>%
+  janitor::clean_names() %>%
+  drop_na() %>%
+  separate(mon, into  = c("year", "month", "day"), sep = "-") %>%
+  mutate(year = as.integer(year), 
+         month = as.integer(month),
+         day = as.integer(day), 
+         month = month.abb[month]) %>%
+  pivot_longer(
+    c(prez_gop, prez_dem),
+    names_to = "president", 
+    values_to = "prez_value"
+  ) %>%
+  mutate(president = recode(president, "prez_gop" = "gop", "prez_dem" = "dem")) %>%
+  filter(!prez_value == 0) %>%
+  select(-day) 
+ncol(pols)` variables. It concludes the key variables such as year, month and president. It shows the number of national politicians(governors/senators/representatives) in U.S., and whether the president is democratic or republican every month from Jan/1947 to Jun/2015.
+```{r}
+library(tidyverse)
+pols = read_csv("./data/p3/pols-month.csv",
+                col_names = TRUE,
+                show_col_types = FALSE) %>%
+  janitor::clean_names() %>%
+  drop_na() %>%
+  separate(mon, into  = c("year", "month", "day"), sep = "-") %>%
+  mutate(year = as.integer(year), 
+         month = as.integer(month),
+         day = as.integer(day), 
+         month = month.abb[month]) %>%
+  pivot_longer(
+    c(prez_gop, prez_dem),
+    names_to = "president", 
+    values_to = "prez_value"
+  ) %>%
+  mutate(president = recode(president, "prez_gop" = "gop", "prez_dem" = "dem")) %>%
+  filter(!prez_value == 0) %>%
+  select(-day)
+  
+nrow(pols)
+ncol(pols)
+pols
+```
+
+### Snp
+Second, clean the data in snp.csv using a similar process to the above. For consistency across datasets, arrange according to year and month, and organize so that year and month are the leading columns.
+
+Description: in snp dateset, there are `r snp = read_csv("./data/p3/snp.csv",
+              col_names = TRUE) %>%
+  drop_na() %>%
+  janitor::clean_names() %>%
+  separate(date, into  = c("month", "day", "year")) %>%
+  mutate(year = as.integer(year), 
+         year = ifelse(year < 23, year + 2000, year + 1900), 
+         month = as.integer(month),
+         day = as.integer(day), 
+         month = month.abb[month]) %>%
+  arrange(year, month) %>%
+  select(-day) %>%
+  select(year, month, everything())
+  nrow(snp) ` observations and `r snp = read_csv("./data/p3/snp.csv",
+              col_names = TRUE) %>%
+  drop_na() %>%
+  janitor::clean_names() %>%
+  separate(date, into  = c("month", "day", "year")) %>%
+  mutate(year = as.integer(year), 
+         year = ifelse(year < 23, year + 2000, year + 1900), 
+         month = as.integer(month),
+         day = as.integer(day), 
+         month = month.abb[month]) %>%
+  arrange(year, month) %>%
+  select(-day) %>%
+  select(year, month, everything())
+  ncol(snp) ` variables. It concludes the key variables such as year, month and close. It shows the date and the closing values of the S&P stock index from Apr/1950 to May/2015.
+```{r}
+library(tidyverse)
+snp = read_csv("./data/p3/snp.csv",
+              col_names = TRUE) %>%
+  drop_na() %>%
+  janitor::clean_names() %>%
+  separate(date, into  = c("month", "day", "year")) %>%
+  mutate(year = as.integer(year), 
+         year = ifelse(year < 23, year + 2000, year + 1900), 
+         month = as.integer(month),
+         day = as.integer(day), 
+         month = month.abb[month]) %>%
+  arrange(year, month) %>%
+  select(-day) %>%
+  select(year, month, everything())
+
+snp
+```
+
+### Unemployment
+Third, tidy the unemployment data so that it can be merged with the previous datasets. This process will involve switching from “wide” to “long” format; ensuring that key variables have the same name; and ensuring that key variables take the same values.
+
+Description: in unemployment dateset, there are `r unemployment = read_csv("./data/p3/unemployment.csv",
+              col_names = TRUE,
+              show_col_types = FALSE) %>%
+  drop_na() %>%
+  pivot_longer(
+    Jan:Dec, 
+    names_to = "month", 
+    values_to = "unemployment_percent") %>%
+  janitor::clean_names() %>%
+  arrange(year, month)  
+  nrow(unemployment) ` observations and `r unemployment = read_csv("./data/p3/unemployment.csv",
+              col_names = TRUE,
+              show_col_types = FALSE) %>%
+  drop_na() %>%
+  pivot_longer(
+    Jan:Dec, 
+    names_to = "month", 
+    values_to = "unemployment_percent") %>%
+  janitor::clean_names() %>%
+  arrange(year, month)  
+  ncol(unemployment) ` variables. It concludes the key variables such as year, month and unemployment_percent. It shows the percentage of unemployment in each month from Apr/1948 to Sep/2014.
+```{r}
+library(tidyverse)
+unemployment = read_csv("./data/p3/unemployment.csv",
+              col_names = TRUE,
+              show_col_types = FALSE) %>%
+  drop_na() %>%
+  pivot_longer(
+    Jan:Dec, 
+    names_to = "month", 
+    values_to = "unemployment_percent") %>%
+  janitor::clean_names() %>%
+  arrange(year, month)
+  
+unemployment
+```
+
+### Merging 
+Join the datasets by merging snp into pols, and merging unemployment into the result.
+
+Overall description:
+The separate descriptions are shown before. According to the merged dataset above, we can get the following information. It includes `r pols_snp = left_join(pols, snp, by = c("year", "month"))
+pols_snp_unemployment = left_join(pols_snp, unemployment, by = c("year", "month")) 
+nrow(pols_snp_unemployment) ` observations and `r pols_snp = left_join(pols, snp, by = c("year", "month"))
+pols_snp_unemployment = left_join(pols_snp, unemployment, by = c("year", "month"))  
+ncol(pols_snp_unemployment) ` variants. It shows the number of governors/senators/representatives and president of republican/ democratic every month from Jan/1947 to Jun/2015. The key variable president shows whether the president is a republican (gop = 1/2) or democratic (dem = 1). It also shows the closing dates and  values of the S&P stock index, and percentage of unemployment every month from Jan/1947 to Jun/2015.
+```{r}
+pols_snp = left_join(pols, snp, by = c("year", "month"))
+pols_snp_unemployment = left_join(pols_snp, unemployment, by = c("year", "month"))
+nrow(pols_snp_unemployment) 
+ncol(pols_snp_unemployment)
+
+pols_snp_unemployment
+```
+
