@@ -275,6 +275,7 @@ pols_snp_unemployment
 ```
 
 ## Problem 1
+### Read and clean
 Read and clean the data; retain line, station, name, station latitude / longitude, routes served, entry, vending, entrance type, and ADA compliance. Convert the entry variable from character (YES vs NO) to a logical variable (the ifelse or recode function may be useful).
 
 There are `r nyc_transit = read_csv("./data/p1.csv",
@@ -326,7 +327,7 @@ nyc_transit
          
 ```
 
-
+### The number of stations
 There are `r nyc_transit %>%
   distinct(station_name, line) %>% 
   nrow()` different stations according to the station_name and line.
@@ -336,6 +337,7 @@ nyc_transit %>%
   nrow()
 ```
 
+### ADA compliant
 There are `r nyc_transit %>%
   filter(ada == "TRUE") %>%
   distinct(station_name, line) %>% 
@@ -347,6 +349,7 @@ nyc_transit %>%
   nrow()
 ```
 
+### Proportion
 What proportion of station entrances / exits without vending allow entrance?
 The proportion of station entrances / exits without vending allow entrance is 0.434.
 ```{r}
@@ -366,6 +369,7 @@ proportion = nrow(entry_without_vending) / nrow(without_vending)
 proportion
 ```
 
+### Reformat
 Reformat data so that route number and route name are distinct variables. How many distinct stations serve the A train? 
 
 I already tidied the dataset before to make routes into 1 column. Now I will reformat and do it again and there are 60 stations serve the A train.
